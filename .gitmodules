@@ -1,0 +1,4 @@
+[submodule "labelImg"]
+	path = labelImg
+	url = https://github.com/tzutalin/labelImg.git
+	branch = py2-qt4
