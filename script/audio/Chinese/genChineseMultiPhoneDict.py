@@ -12,20 +12,20 @@ if __name__ == "__main__":
         "--input",
         help="Path to input files",
         default='input')
-        # required=True)
     parser.add_argument(
         "--output",
         help="Path to output files",
         default='output')
     args = vars(parser.parse_args())
-    input_dir = os.path.join(os.getcwd(), args["input"])
-    output_dir = os.path.join(os.getcwd(), args["output"])
+    input_dir = os.path.join(os.getcwd(), args["input"])    # default input dir : thchs30/data
+    output_dir = os.path.join(os.getcwd(), args["output"])  # output dir
     if not os.path.isdir(output_dir):
         os.makedirs(output_dir)
     print input_dir
     Chinese = u'[\u4e00-\u9fa5]+'
     Chinese_phone_dict1 = {}
     Chinese_phone_dict2 = {}
+    Chinese_phone2phone_dict = {}
     fail_word = 0
     total_word = 0
     for root, root_dir_names, root_file_names in os.walk(input_dir):
@@ -78,25 +78,56 @@ if __name__ == "__main__":
             # print(Chinese_words)
             for index, word in enumerate(Chinese_words):
                 # print(index, len(Chinese_words))
-                Chinese_phone_dict1[word] = phone1_list[index]
-                Chinese_phone_dict2[word] = phone2_list[index*2:index*2+2]
+                if word in Chinese_phone_dict1:
+                    Chinese_phone_dict1[word].add(phone1_list[index])
+                else:
+                    Chinese_phone_dict1[word] = set([phone1_list[index]])
+                if word in Chinese_phone_dict2:
+                    Chinese_phone_dict2[word].add(' '.join(phone2_list[index*2:index*2+2]))
+                else:
+                    Chinese_phone_dict2[word] = set([' '.join(phone2_list[index*2:index*2+2])])
+                if phone1_list[index] in Chinese_phone2phone_dict:
+                    Chinese_phone2phone_dict[phone1_list[index]].add(' '.join(phone2_list[index*2:index*2+2]))
+                else:
+                    Chinese_phone2phone_dict[phone1_list[index]] = set([' '.join(phone2_list[index*2:index*2+2])])
             # print("Chinese_phone_dict1 size: %d" % (len(Chinese_phone_dict1)))
             # print("Chinese_phone_dict2 size: %d" % (len(Chinese_phone_dict2)))
-    Chinese_phone_dict1[u'\u3002'] = '<stop>'
-    Chinese_phone_dict1[u'\uff0c'] = '<comma>'
-    Chinese_phone_dict1[u'\uff01'] = '<exclam>'
-    Chinese_phone_dict1[u'\uff1f'] = '<question>'
-    Chinese_phone_dict1[u'\u2018'] = '<quotation>'
-    Chinese_phone_dict1[u'\u201c'] = '<quotation>'
-    Chinese_phone_dict1[u'\u201d'] = '<quotation>'
-    Chinese_phone_dict1[u'\u2019'] = '<quotation>'
-    Chinese_phone_dict1[u'\''] = '<quotation>'
-    Chinese_phone_dict1[u'\"'] = '<quotation>'
-    Chinese_phone_dict1[u'\uff1a'] = '<colon>'
-    Chinese_phone_dict1[u'\uff1b'] = '<semicolon>'
-    Chinese_phone_dict1[u'\u3001'] = '<pause>'
-    json.dump(Chinese_phone_dict1, open(args["output"]+'/Chinese_phone_dict1.json', 'w'), indent=4)
-    json.dump(Chinese_phone_dict2, open(args["output"]+'/Chinese_phone_dict2.json', 'w'), indent=4)
+    for key in Chinese_phone_dict1.keys():
+        Chinese_phone_dict1[key] = list(Chinese_phone_dict1[key])
+    for key in Chinese_phone_dict2.keys():
+        Chinese_phone_dict2[key] = list(Chinese_phone_dict2[key])
+    for key in Chinese_phone2phone_dict.keys():
+        Chinese_phone2phone_dict[key] = list(Chinese_phone2phone_dict[key])
+    Chinese_phone_dict1[u'\u3002'] = ['<stop>']
+    Chinese_phone_dict1[u'\uff0c'] = ['<comma>']
+    Chinese_phone_dict1[u'\uff01'] = ['<exclam>']
+    Chinese_phone_dict1[u'\uff1f'] = ['<question>']
+    Chinese_phone_dict1[u'\u2018'] = ['<quotation>']
+    Chinese_phone_dict1[u'\u201c'] = ['<quotation>']
+    Chinese_phone_dict1[u'\u201d'] = ['<quotation>']
+    Chinese_phone_dict1[u'\u2019'] = ['<quotation>']
+    Chinese_phone_dict1[u'\''] = ['<quotation>']
+    Chinese_phone_dict1[u'\"'] = ['<quotation>']
+    Chinese_phone_dict1[u'\uff1a'] = ['<colon>']
+    Chinese_phone_dict1[u'\uff1b'] = ['<semicolon>']
+    Chinese_phone_dict1[u'\u3001'] = ['<pause>']
+
+    Chinese_phone_dict2[u'\u3002'] = ['<stop>']
+    Chinese_phone_dict2[u'\uff0c'] = ['<comma>']
+    Chinese_phone_dict2[u'\uff01'] = ['<exclam>']
+    Chinese_phone_dict2[u'\uff1f'] = ['<question>']
+    Chinese_phone_dict2[u'\u2018'] = ['<quotation>']
+    Chinese_phone_dict2[u'\u201c'] = ['<quotation>']
+    Chinese_phone_dict2[u'\u201d'] = ['<quotation>']
+    Chinese_phone_dict2[u'\u2019'] = ['<quotation>']
+    Chinese_phone_dict2[u'\''] = ['<quotation>']
+    Chinese_phone_dict2[u'\"'] = ['<quotation>']
+    Chinese_phone_dict2[u'\uff1a'] = ['<colon>']
+    Chinese_phone_dict2[u'\uff1b'] = ['<semicolon>']
+    Chinese_phone_dict2[u'\u3001'] = ['<pause>']
+    json.dump(Chinese_phone_dict1, open(args["output"]+'/Chinese_multiphone_dict1.json', 'w'), indent=4)
+    json.dump(Chinese_phone_dict2, open(args["output"]+'/Chinese_multiphone_dict2.json', 'w'), indent=4)
+    json.dump(Chinese_phone2phone_dict, open(args["output"]+'/Chinese_phone2phone_dict.json', 'w'), indent=4)
     print("fail_word: %d" % (fail_word)) 
     print("total_word: %d" % (total_word)) 
     print("finished")

@@ -13,14 +13,14 @@ def update_progress(progress):
 class phoneDict(object):
     def __init__(self, file_path):
         self.phone_dict = self.loadDict(file_path)
-        self.mark_dict = {1:'<stop>',2:'<comma>',3:'<question>',4:'<exclam>',5:'<semicolon>',6:'<colon>',7:'<other>'}
+        self.mark_dict = {1: '<stop>', 2: '<comma>', 3: '<question>', 4: '<exclam>', 5: '<semicolon>', 6: '<colon>', 7: '<other>'}
         # self.re_list =[r"\w+-\w+", r"\w+'\w+", r"\w+\.\w+",r"\w+\.'\w+",r"\w+\.\w+\."]
 
     def loadDict(self, file_path):
         fileIn = open(file_path)
         my_dict = {}
         for line in fileIn:
-            line = line.replace('  ',' ')
+            line = line.replace('  ', ' ')
             lineArr = line.rstrip().split(' ')
             my_dict[str(lineArr[0])] = list(lineArr[1:])
         return my_dict
@@ -49,13 +49,13 @@ class phoneDict(object):
         text = text.strip().upper()
         # print("text: %s" % (text))
         if '"' in text:
-            text =text.replace('"','')
+            text = text.replace('"', '')
         if '-' in text:
-            text =text.replace('-','')
+            text = text.replace('-', '')
         if '&' in text:
             return -1
         if '  ' in text:
-            text =text.replace('  ',' ')
+            text = text.replace('  ', ' ')
         res = r"[a-z]+"
         res2 = r"(\w+-\w+)|(\w+'\w+)|(\w+\.\w+\.)|(\w+\.'\w+)|(\w+)"
         words_list = text.split(' ')
@@ -150,33 +150,33 @@ class phoneDict(object):
 
 if __name__ == '__main__':
     parser = ap.ArgumentParser()
-    parser.add_argument("--output",help="Path to input files", default="output") 
+    parser.add_argument("--output", help="Path to input files", default="output") 
     parser.add_argument("--wav_dir", default='txt', type=str, help="Directory to store the dataset.")
     parser.add_argument("--txt_dir", default='wav', type=str, help="Directory to store the dataset.")
 
     args = vars(parser.parse_args())
-    input_txt_dir = args["txt_dir"]  # 输入文件夹中的txt文件夹
-    input_wav_dir = args["wav_dir"]  # 输入文件夹中的wav文件夹
-    output_phone_dir = os.path.join(args["output"], 'phone-txt')  # 输出音素文件为输出文件夹下phone文件夹
+    input_txt_dir = args["txt_dir"]  # input txt dir
+    input_wav_dir = args["wav_dir"]  # input wav dir
+    output_phone_dir = os.path.join(args["output"], 'phone-txt')  # output phone txt dir 
     if not os.path.isdir(output_phone_dir):
         os.makedirs(output_phone_dir)
-    output_wav_dir = os.path.join(args["output"], 'phone-wav')
+    output_wav_dir = os.path.join(args["output"], 'phone-wav')    # output phone wav dir 
     if not os.path.isdir(output_wav_dir):
         os.makedirs(output_wav_dir)
-    dict_class = phoneDict('cmudict-0.7b')  # 读音素字典
-    print("test word: %s : %s " % ('hello',dict_class.txtToDict2("do you see a man skilled in his work? he will serve kings. he won't serve obscure men.")))  # 字典测试
+    dict_class = phoneDict('cmudict-0.7b')  # load phone dict
+    print("test word: %s : %s " % ('hello', dict_class.txtToDict2("do you see a man skilled in his work? he will serve kings. he won't serve obscure men.")))  # 字典测试
     input_files = os.listdir(input_txt_dir)
     data_num = 0
     total_num = len(input_files)
-    for index,file_name in enumerate(input_files):
+    for index, file_name in enumerate(input_files):
         # break
         # print("Processing: %s" % (file_name))
         lines = open(os.path.join(input_txt_dir, file_name)).readlines()
-        fid = open(os.path.join(output_phone_dir, file_name),'w')
+        fid = open(os.path.join(output_phone_dir, file_name), 'w')
         for line in lines:
             line = line.strip()
             word_content = dict_class.txtToDict2(line)
-            if word_content == -1:  # 若存在不能识别的单词标记为-1，删除正在写的音素文件，不拷贝wav文件
+            if word_content == -1:  # if transform failed return -1，delete fid->file 
                 fid.close()
                 os.system("rm "+os.path.join(output_phone_dir, file_name))
                 # print("failed: %s " % (file_name))

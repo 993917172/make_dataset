@@ -4,7 +4,6 @@ import os
 import argparse as ap
 import re
 import json
-from utils import update_progress
 from multiprocessing import Pool as mp
 
 
@@ -17,29 +16,6 @@ class phoneDict(object):
         my_dict = json.load(fileIn)
         return my_dict
 
-    def txtToDict2(self, text):
-        pho_result = []
-        try:
-            text = text.decode('utf8','ignore')
-        except:
-            try:
-                text = text.decode('gbk','ignore')
-            except:
-                return -1
-        # print("text: %s" % (text))
-        # print words_list
-        for word in text:
-            # for curr_re in self.re_list:
-            #     words_mix = re.findall(curr_re, words)
-            #     if len(words_mix) > 0:
-            #         print("found speacial: %s" % (words_mix))
-            #         break
-            if word in self.phone_dict:
-                pho_result.append([self.phone_dict[word]])
-            else:
-                return -1
-        return pho_result
-
 def _convert_transcription(phone_dict, line, txtfile_path, output_txt_file, failed_txt_file):
     pass_flag = True
     failed_words = ''
@@ -49,7 +25,7 @@ def _convert_transcription(phone_dict, line, txtfile_path, output_txt_file, fail
     for word in line:
         if word in phone_dict:
             hasPhone = phone_dict[word]
-            if len(hasPhone) > 1:
+            if len(hasPhone) > 1:   # if it's polyphone
                 pass_flag = False
                 failed_words += word
                 failed_list.append(' '.join(hasPhone))
@@ -59,7 +35,7 @@ def _convert_transcription(phone_dict, line, txtfile_path, output_txt_file, fail
                 fid.write(hasPhone[0]+'\n')
                 fid.write('<space>\n')
                 content.append(hasPhone[0])
-        else:
+        else:  # failed to transform phone
             pass_flag = False
             failed_words += word
             failed_list.append('#')
@@ -86,24 +62,24 @@ if __name__ == '__main__':
     parser.add_argument("--dict_file", default='Chinese_phone_dict1.json', type=str, help="Directory to store the dataset.")
 
     args = vars(parser.parse_args())
-    input_txt_dir = args["txt_dir"]  # 输入文件夹中的txt文件夹
-    input_wav_dir = args["wav_dir"]  # 输入文件夹中的wav文件夹
+    input_txt_dir = args["txt_dir"]  # input txt dir
+    input_wav_dir = args["wav_dir"]  # input wav dir
     dict_file = args["dict_file"]
-    output_txt_dir = os.path.join(args["output"], 'phone-txt')  # 输出音素文件为输出文件夹下phone文件夹
+    output_txt_dir = os.path.join(args["output"], 'phone-txt')  # output phoneme txt dir
     if not os.path.isdir(output_txt_dir):
         os.makedirs(output_txt_dir)
     # output_wav_dir = os.path.join(args["output"], 'phone-wav')
     # if not os.path.isdir(output_wav_dir):
     #     os.makedirs(output_wav_dir)
-    failed_txt_dir = os.path.join(args["output"], 'failed-txt')  # 输出音素文件为输出文件夹下phone文件夹
+    failed_txt_dir = os.path.join(args["output"], 'failed-txt')  # output failed to transform txt dir
     if not os.path.isdir(failed_txt_dir):
         os.makedirs(failed_txt_dir)
     # failed_wav_dir = os.path.join(args["output"], 'failed-wav')
     # if not os.path.isdir(failed_wav_dir):
     #     os.makedirs(failed_wav_dir)
 
-    dict_class = phoneDict(dict_file)  # 读音素字典
-    print("test word: %s : %s " % ('hello',dict_class.txtToDict2("今天。")))  # 字典测试
+    dict_class = phoneDict(dict_file)  # load phone dict
+    print("test word: %s : %s " % ('hello',dict_class.txtToDict2("今天。")))  # dictionary test
     input_files = os.listdir(input_txt_dir)
     data_num = 0
     total_num = len(input_files)

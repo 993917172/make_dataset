@@ -5,7 +5,6 @@ import argparse as ap
 import re
 import json
 import fnmatch
-from utils import update_progress
 
 
 class phoneDict(object):

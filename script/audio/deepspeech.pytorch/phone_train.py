@@ -9,11 +9,9 @@ from torch.autograd import Variable
 from warpctc_pytorch import CTCLoss
 
 from data.bucketing_sampler import BucketingSampler, SpectrogramDatasetWithLength
-from data.word_data_loader import AudioDataLoader, SpectrogramDataset
-from word_decoder import GreedyDecoder
+from data.phone_data_loader import AudioDataLoader, SpectrogramDataset
+from phone_decoder import GreedyDecoder
 from model import DeepSpeech, supported_rnns
-os.environ["CUDA_VISIBLE_DEVICES"]="3"
-
 
 parser = argparse.ArgumentParser(description='DeepSpeech training')
 parser.add_argument('--train_manifest', metavar='DIR',
@@ -130,7 +128,8 @@ def main():
     criterion = CTCLoss()
 
     with open(args.labels_path) as label_file:
-        labels = str(''.join(json.load(label_file)))
+        # labels = str(''.join(json.load(label_file)))
+        labels = json.load(label_file)
     audio_conf = dict(sample_rate=args.sample_rate,
                       window_size=args.window_size,
                       window_stride=args.window_stride,
@@ -159,7 +158,8 @@ def main():
     parameters = model.parameters()
     optimizer = torch.optim.SGD(parameters, lr=args.lr,
                                 momentum=args.momentum, nesterov=True)
-    decoder = GreedyDecoder(labels)
+    # decoder = GreedyDecoder(labels)
+    decoder = GreedyDecoder(labels,space_index=labels.index('<space>'),blank_index=labels.index('_'))
 
     if args.continue_from:
         print("Loading checkpoint model %s" % args.continue_from)
@@ -316,9 +316,10 @@ def main():
             target_strings = decoder.process_strings(decoder.convert_to_strings(split_targets))
             wer, cer = 0, 0
             for x in range(len(target_strings)):
-                print(target_strings[x])
-                wer += decoder.wer(decoded_output[x], target_strings[x]) / float(len(target_strings[x].split()))
-                cer += decoder.cer(decoded_output[x], target_strings[x]) / float(len(target_strings[x]))
+                # wer += decoder.wer(decoded_output[x], target_strings[x]) / float(len(target_strings[x].split()))
+                # cer += decoder.cer(decoded_output[x], target_strings[x]) / float(len(target_strings[x]))
+                wer += decoder.wer(decoded_output[x], target_strings[x]) / float(len(target_strings[x].replace(' ','').split('<space>')))
+                cer += decoder.cer(decoded_output[x], target_strings[x]) / float(len(target_strings[x].split(' ')))
             total_cer += cer
             total_wer += wer
 

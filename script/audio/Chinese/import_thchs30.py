@@ -7,18 +7,11 @@ import sys
 import os
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 
-import codecs
 import fnmatch
 import pandas
-import progressbar
 import subprocess
-import tarfile
-import unicodedata
 import json
-from utils import update_progress
-from sox import Transformer
-from tensorflow.contrib.learn.python.learn.datasets import base
-from tensorflow.python.platform import gfile
+
 
 def _preprocess_data(data_dir):
 

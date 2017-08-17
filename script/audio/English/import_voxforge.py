@@ -1,7 +1,5 @@
 import os
-from six.moves import urllib
 import argparse
-import re
 import tempfile
 import shutil
 import subprocess
@@ -43,7 +41,7 @@ def prepare_sample(target_tgz, target_folder):
         os.makedirs(txt_dir)
     recording_name = os.path.basename(target_tgz)[:-4]
     dirpath = tempfile.mkdtemp()
-    print(target_tgz,recording_name)
+    print(target_tgz, recording_name)
     tar = tarfile.open(target_tgz)
     tar.extractall(dirpath)
     tar.close()
@@ -65,8 +63,7 @@ def prepare_sample(target_tgz, target_folder):
             with io.FileIO(target_txt_file, "w") as file:
                 file.write(utterance.lower().encode('utf-8'))
             original_wav_file = os.path.join(recordings_dir, wav_file)
-            subprocess.call(["sox {}  -r {} -b 16 -c 1 {}".format(original_wav_file, str(args.sample_rate),
-                                                                      target_wav_file)], shell=True)
+            subprocess.call(["sox {}  -r {} -b 16 -c 1 {}".format(original_wav_file, str(args.sample_rate), target_wav_file)], shell=True)
     shutil.rmtree(dirpath)
 
 
@@ -79,6 +76,6 @@ if __name__ == '__main__':
     for root, root_dir_names, filenames in os.walk(input_dir):
         print root, root_dir_names, len(filenames)
         for filename in fnmatch.filter(filenames, '*.tgz'):
-            prepare_sample(os.path.join(root,filename), target_dir)
+            prepare_sample(os.path.join(root, filename), target_dir)
     print('Creating manifests...')
     create_manifest(target_dir, 'voxforge_train')

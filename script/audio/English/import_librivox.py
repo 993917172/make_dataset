@@ -6,49 +6,36 @@ from __future__ import absolute_import, division, print_function
 import sys
 import os
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
-
 import codecs
 import fnmatch
 import pandas
-import progressbar
-import subprocess
-import tarfile
 import unicodedata
 
-from sox import Transformer
-from tensorflow.contrib.learn.python.learn.datasets import base
-from tensorflow.python.platform import gfile
 
 def _preprocess_data(data_dir):
 
     print("Converting FLAC to WAV and splitting transcriptions...")
     LIBRIVOX_DIR = "LibriSpeech"
     work_dir = os.path.join(data_dir, LIBRIVOX_DIR)
-        #train_100 = _convert_audio_and_split_sentences(work_dir, "train-clean-100", "train-clean-100-wav")
-        #bar.update(0)
-        #train_360 = _convert_audio_and_split_sentences(work_dir, "train-clean-360", "train-clean-360-wav")
-        #bar.update(1)
+    # train_100 = _convert_audio_and_split_sentences(work_dir, "train-clean-100", "train-clean-100-wav")
+    # train_360 = _convert_audio_and_split_sentences(work_dir, "train-clean-360", "train-clean-360-wav")
     train_500 = _convert_audio_and_split_sentences(work_dir, "train-other-500", "train-other-500-wav", "train-other-500-txt")
-
-        #dev_clean = _convert_audio_and_split_sentences(work_dir, "dev-clean", "dev-clean-wav")
-        #bar.update(1)
+    # dev_clean = _convert_audio_and_split_sentences(work_dir, "dev-clean", "dev-clean-wav")
     dev_other = _convert_audio_and_split_sentences(work_dir, "dev-other", "dev-other-wav", "dev-other-txt")
-        #bar.update(2)
-
-        #test_clean = _convert_audio_and_split_sentences(work_dir, "test-clean", "test-clean-wav")
-        #bar.update(3)
+    # test_clean = _convert_audio_and_split_sentences(work_dir, "test-clean", "test-clean-wav")
     test_other = _convert_audio_and_split_sentences(work_dir, "test-other", "test-other-wav", "test-other-txt")
 
     # Write sets to disk as CSV files
-    #train_100.to_csv(os.path.join(data_dir, "librivox-train-clean-100.csv"), index=False)
-    #train_360.to_csv(os.path.join(data_dir, "librivox-train-clean-360.csv"), index=False)
-    train_500.to_csv(os.path.join(data_dir, "librivox-train-other-500.csv"), index=False,header=False)
+    # train_100.to_csv(os.path.join(data_dir, "librivox-train-clean-100.csv"), index=False)
+    # train_360.to_csv(os.path.join(data_dir, "librivox-train-clean-360.csv"), index=False)
+    train_500.to_csv(os.path.join(data_dir, "librivox-train-other-500.csv"), index=False, header=False)
 
-    #dev_clean.to_csv(os.path.join(data_dir, "librivox-dev-clean.csv"), index=False)
-    dev_other.to_csv(os.path.join(data_dir, "librivox-dev-other.csv"), index=False,header=False)
+    # dev_clean.to_csv(os.path.join(data_dir, "librivox-dev-clean.csv"), index=False)
+    dev_other.to_csv(os.path.join(data_dir, "librivox-dev-other.csv"), index=False, header=False)
 
-    #test_clean.to_csv(os.path.join(data_dir, "librivox-test-clean.csv"), index=False)
-    test_other.to_csv(os.path.join(data_dir, "librivox-test-other.csv"), index=False,header=False)
+    # test_clean.to_csv(os.path.join(data_dir, "librivox-test-clean.csv"), index=False)
+    test_other.to_csv(os.path.join(data_dir, "librivox-test-other.csv"), index=False, header=False)
+
 
 def _convert_audio_and_split_sentences(extracted_dir, data_set, dest_dir, dest_dir2):
     source_dir = os.path.join(extracted_dir, data_set)
@@ -80,10 +67,10 @@ def _convert_audio_and_split_sentences(extracted_dir, data_set, dest_dir, dest_d
 
                     transcript = transcript.lower().strip()
                     if '"' in transcript:
-                        transcript = transcript.replace('"','')
+                        transcript = transcript.replace('"', '')
                     # print(transcript)
                     txt_file = os.path.join(target_txt_dir, seqid+".txt")
-                    txt_fid = open(txt_file,'w')
+                    txt_fid = open(txt_file, 'w')
                     txt_fid.write(transcript+'\n')
                     txt_fid.close()
 
@@ -97,6 +84,7 @@ def _convert_audio_and_split_sentences(extracted_dir, data_set, dest_dir, dest_d
                     files.append((os.path.abspath(wav_file), os.path.abspath(txt_file)))
 
     return pandas.DataFrame(data=files, columns=["wav_filename", "txt_filename"])
+
 
 if __name__ == "__main__":
     _preprocess_data('/data5/hyzhan/data/librivox-other')

@@ -4,12 +4,7 @@ from __future__ import absolute_import, division, print_function
 # Make sure we can import stuff from util/
 # This script needs to be run from the root of the DeepSpeech repository
 import os
-import fnmatch
 import pandas
-import subprocess
-import unicodedata
-import json
-from utils import update_progress
 from multiprocessing import Pool as mp
 from TextToPhoneme import phoneDict
 

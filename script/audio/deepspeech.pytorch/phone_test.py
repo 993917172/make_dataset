@@ -4,8 +4,8 @@ import json
 import torch
 from torch.autograd import Variable
 
-from data.word_data_loader import SpectrogramDataset, AudioDataLoader
-from word_decoder import GreedyDecoder
+from data.phone_data_loader import SpectrogramDataset, AudioDataLoader
+from phone_decoder import GreedyDecoder
 from model import DeepSpeech
 
 parser = argparse.ArgumentParser(description='DeepSpeech prediction')
@@ -44,7 +44,7 @@ if __name__ == '__main__':
             scorer = Scorer()
         decoder = BeamCTCDecoder(labels, scorer, beam_width=args.beam_width, top_paths=1, space_index=labels.index(' '), blank_index=labels.index('_'))
     else:
-        decoder = GreedyDecoder(labels, space_index=labels.index(' '), blank_index=labels.index('_'))
+        decoder = GreedyDecoder(labels, space_index=labels.index('<space>'), blank_index=labels.index('_'))
 
     test_dataset = SpectrogramDataset(audio_conf=audio_conf, manifest_filepath=args.test_manifest, labels=labels,
                                       normalize=True)
@@ -75,8 +75,10 @@ if __name__ == '__main__':
         target_strings = decoder.process_strings(decoder.convert_to_strings(split_targets))
         wer, cer = 0, 0
         for x in range(len(target_strings)):
-            wer += decoder.wer(decoded_output[x], target_strings[x]) / float(len(target_strings[x].split()))
-            cer += decoder.cer(decoded_output[x], target_strings[x]) / float(len(target_strings[x]))
+            # wer += decoder.wer(decoded_output[x], target_strings[x]) / float(len(target_strings[x].split()))
+            # cer += decoder.cer(decoded_output[x], target_strings[x]) / float(len(target_strings[x]))
+            wer += decoder.wer(decoded_output[x], target_strings[x]) / float(len(target_strings[x].replace(' ','').split('<space>')))
+            cer += decoder.cer(decoded_output[x], target_strings[x]) / float(len(target_strings[x].split(' ')))
         total_cer += cer
         total_wer += wer
 

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import os
 import argparse as ap
 import json
 
@@ -15,7 +14,7 @@ if __name__ == "__main__":
         help="Path to input files",
         default="output")
     args = vars(parser.parse_args())
-    input_file = args["input_file"]
+    input_file = args["input_file"]   # input dictionary file
     lines = open(input_file).readlines()
     phone_set = set()
     for line in lines:

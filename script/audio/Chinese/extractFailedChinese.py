@@ -4,10 +4,13 @@ import os
 import argparse as ap
 import re
 import json
-from utils import update_progress
 from multiprocessing import Pool as mp
 
 
+def update_progress(progress):
+    print("\rProgress: [{0:50s}] {1:.1f}%".format('#' * int(progress * 50),
+                                                  progress * 100), end="")
+    
 class phoneDict(object):
     def __init__(self, file_path):
         self.phone_dict = self.loadDict(file_path)
@@ -16,29 +19,6 @@ class phoneDict(object):
         fileIn = file(file_path)
         my_dict = json.load(fileIn)
         return my_dict
-
-    def txtToDict2(self, text):
-        pho_result = []
-        try:
-            text = text.decode('utf8','ignore')
-        except:
-            try:
-                text = text.decode('gbk','ignore')
-            except:
-                return -1
-        # print("text: %s" % (text))
-        # print words_list
-        for word in text:
-            # for curr_re in self.re_list:
-            #     words_mix = re.findall(curr_re, words)
-            #     if len(words_mix) > 0:
-            #         print("found speacial: %s" % (words_mix))
-            #         break
-            if word in self.phone_dict:
-                pho_result.append([self.phone_dict[word]])
-            else:
-                return -1
-        return pho_result
 
 def _convert_transcription(phone_dict, line, output_txt_file):
     pass_flag = True
@@ -66,13 +46,13 @@ if __name__ == '__main__':
     parser.add_argument("--dict_file", default='Chinese_phone_dict1.json', type=str, help="Directory to store the dataset.")
 
     args = vars(parser.parse_args())
-    input_txt_dir = args["txt_dir"]  # 输入文件夹中的txt文件夹
+    input_txt_dir = args["txt_dir"]  # input txt dir
     dict_file = args["dict_file"]
-    output_txt_dir =  args["output"]
+    output_txt_dir =  args["output"]   # output failed transform phone txt dir
     if not os.path.isdir(output_txt_dir):
         os.makedirs(output_txt_dir)
 
-    dict_class = phoneDict(dict_file)  # 读音素字典
+    dict_class = phoneDict(dict_file)  # load phone dict
     input_files = os.listdir(input_txt_dir)
     data_num = 0
     total_num = len(input_files)
@@ -95,7 +75,7 @@ if __name__ == '__main__':
             # _convert_transcription(dict_class.phone_dict, line, txtfile_path, output_txt_file, failed_txt_file)
     processers.close()
     processers.join()
-    target_file = os.path.join(output_txt_dir, 'expand_words.txt')
+    target_file = os.path.join(output_txt_dir, 'expand_words.txt')   
     if os.path.exists(target_file):
        os.system('rm '+target_file)
     output_files = os.listdir(output_txt_dir)

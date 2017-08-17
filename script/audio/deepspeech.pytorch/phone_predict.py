@@ -5,8 +5,8 @@ import time
 import torch
 from torch.autograd import Variable
 
-from data.word_data_loader import SpectrogramParser
-from word_decoder import GreedyDecoder, BeamCTCDecoder
+from data.phone_data_loader import SpectrogramParser
+from phone_decoder import GreedyDecoder
 from model import DeepSpeech
 
 parser = argparse.ArgumentParser(description='DeepSpeech prediction')
@@ -43,7 +43,7 @@ if __name__ == '__main__':
             scorer = Scorer()
         decoder = BeamCTCDecoder(labels, scorer, beam_width=args.beam_width, top_paths=1, space_index=labels.index(' '), blank_index=labels.index('_'))
     else:
-        decoder = GreedyDecoder(labels, space_index=labels.index(' '), blank_index=labels.index('_'))
+        decoder = GreedyDecoder(labels, space_index=labels.index('<space>'), blank_index=labels.index('_'))
 
     parser = SpectrogramParser(audio_conf, normalize=True)
 

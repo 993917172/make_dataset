@@ -6,11 +6,7 @@ from __future__ import absolute_import, division, print_function
 import os
 import fnmatch
 import pandas
-import subprocess
-import unicodedata
-import json
 from multiprocessing import Pool as mp
-from TextToPhoneme import phoneDict
 
 
 def _preprocess_data(data_dir, output_dir):

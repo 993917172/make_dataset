@@ -6,10 +6,7 @@ from __future__ import absolute_import, division, print_function
 import os
 import fnmatch
 import pandas
-import subprocess
-import unicodedata
-import json,re
-from utils import update_progress
+import re
 from multiprocessing import Pool as mp
 from TextToPhoneme import phoneDict
 
@@ -46,7 +43,7 @@ def _convert_audio_and_split_sentences(extracted_dir, data_set, dest_dir, dest_d
         print(root, dirnames, len(filenames))
         for filename in fnmatch.filter(filenames, '*.stm'):
             trans_filename = os.path.join(root, filename)
-            sph_filename = trans_filename.replace('stm','sph')
+            sph_filename = trans_filename.replace('stm', 'sph')
             # print(sph_filename,trans_filename)
             lines = open(trans_filename, 'r').readlines()
             for index, line in enumerate(lines):
@@ -62,6 +59,7 @@ def _convert_audio_and_split_sentences(extracted_dir, data_set, dest_dir, dest_d
     for file_name in file_names:
         files.append((os.path.abspath(os.path.join(target_dir, file_name+".wav")), os.path.abspath(os.path.join(target_txt_dir, file_name+".txt"))))
     return pandas.DataFrame(data=files, columns=["wav_filename", "txt_filename"])
+
 
 def _check_and_save_wav(sph_filename, target_dir, target_txt_dir, checkClass, line, res, index):
     extract_list = re.findall(res, line)[0]
