@@ -34,4 +34,7 @@ if __name__ == '__main__':
         #     os.system('rm '+os.path.join(input_wav_dir, file_name+".wav"))
     processers.close()
     processers.join()
+    wav_filenames = [i[:-4] for i in os.listdir(input_wav_dir)]
+    txt_filenames = [i[:-4] for i in os.listdir(input_txt_dir)]
+    file_names = set(wav_filenames) & set(txt_filenames)
     print("wav_filenames:%d, txt_filenames:%d, file_names:%d" % (len(wav_filenames), len(txt_filenames), len(file_names)))
