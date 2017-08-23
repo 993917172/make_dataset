@@ -42,7 +42,7 @@ def _convert_transcription(phone_dict, line, output_txt_file):
 if __name__ == '__main__':
     parser = ap.ArgumentParser()
     parser.add_argument("--output",help="Path to input files", default="output") 
-    parser.add_argument("--txt_dir", default='wav', type=str, help="Directory to store the dataset.")
+    parser.add_argument("--txt_dir", default='txt', type=str, help="Directory to store the dataset.")
     parser.add_argument("--dict_file", default='Chinese_phone_dict1.json', type=str, help="Directory to store the dataset.")
 
     args = vars(parser.parse_args())
