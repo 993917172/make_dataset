@@ -47,8 +47,10 @@ def _convert_transcription(phone_dict, line, txtfile_path, output_txt_file, fail
         if not os.path.exists(failed_txt_file):
             os.system('cp '+txtfile_path+' '+failed_txt_file)
             fid2 = open(failed_txt_file, 'w')
-            for word,phone in zip(line, content):
-                fid2.write(word.encode('utf-8')+' '+phone+'\n')
+            fid2.write(line.encode('utf-8')+'\n')
+            fid2.write(' '.join(content).encode('utf-8')+'\n')
+            fid2.write(failed_words.encode('utf-8')+'\n')
+            fid2.write(','.join(failed_list).encode('utf-8')+'\n')
             fid2.close()
     # if not os.path.exists(output_wav_file):
     #     os.system('cp '+wavfile_path+' '+output_txt_file)
